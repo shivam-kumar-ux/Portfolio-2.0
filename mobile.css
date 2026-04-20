@@ -1,0 +1,183 @@
+/* MOBILE.css — Portfolio 2.0 Mobile Optimizations
+   Loads conditionally ≤768px after style.css. Mobile-first fixes for overflows/hidden elements.
+   Fine-grained @media prevents viewport escape (carousel, hero, canvases, grids).
+   Touch-friendly, no desktop impact. */
+
+/* BASE MOBILE OVERRIDES (≤768px) — Refine existing style.css mobile */
+@media screen and (max-width: 768px) {
+  :root {
+    --sec-pad: clamp(2.5rem, 6vw, 3.5rem) 4%;
+    --r: 12px;
+  }
+
+  body {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    /* Prevent zoom on iOS inputs */
+    touch-action: manipulation;
+  }
+
+  /* Navigation tighter */
+  #nav { padding: 1rem 4%; }
+  #nav.scr { padding: 0.75rem 4%; }
+
+  /* Hero: Constrain all to viewport */
+  #hero {
+    padding: 6rem 4% 2.5rem;
+    gap: 1.75rem;
+  }
+  .hero-glow { transform: scale(0.7); }
+  .hero-glow--cyan { width: 280px; height: 280px; top: -80px; left: -120px; }
+  .hero-glow--violet { width: 220px; height: 220px; bottom: -80px; right: -80px; }
+
+  .hero-photo-wrap { width: clamp(200px, 45vw, 240px); height: clamp(200px, 45vw, 240px); }
+  .hero-photo-frame { width: clamp(160px, 38vw, 190px); height: clamp(160px, 38vw, 190px); }
+  #tc.hero-3d-bg {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw;
+    max-height: 100vh;
+    object-fit: cover;
+  }
+
+  /* Stack & center everything earlier */
+  .ab-grid,
+  .ex-grid,
+  .ct-grid { grid-template-columns: 1fr; gap: 2rem; }
+
+  /* Skills: Single column earlier */
+  .sk-pnl.on { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* Services single earlier */
+  .sv-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+
+  /* Canvases viewport-safe */
+  #sfx {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+
+  /* Buttons touch-friendly */
+  .btn-primary,
+  .btn-ghost,
+  .n-cta {
+    min-height: 2.25rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.8rem;
+  }
+  .h-btns { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+  .btn-full { width: 100%; }
+}
+
+/* NARROW PHONES ≤480px (e.g., iPhone SE, Galaxy Fold) */
+@media screen and (max-width: 480px) {
+  html { font-size: 15px; } /* Slight bump for readability */
+
+  #nav { padding: 0.9rem 3.5%; }
+  .n-logo { font-size: 1.2rem; }
+
+  /* Hero ultra-compact */
+  #hero { padding-top: 5.5rem; padding-bottom: 2rem; gap: 1.5rem; }
+  h1 { font-size: clamp(2.2rem, 6.5vw, 4.5rem); }
+  .h-role { font-size: 0.85rem; }
+  .h-sub { font-size: 0.95rem; max-width: none; }
+  .hero-photo-wrap { width: 200px; height: 200px; }
+  .hero-photo-frame { width: 160px; height: 160px; }
+  .hero-photo-badge { font-size: 0.55rem; padding: 0.3rem 0.75rem; bottom: -14px; }
+
+  /* About frame smaller */
+  .ab-frame { aspect-ratio: 0.9; max-width: 260px; margin: 0 auto; }
+
+  /* Info grid single */
+  .info-g { grid-template-columns: 1fr; }
+
+  /* Marquee tighter mask */
+  .mq-wrap {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+
+  .fc { padding: 1.75rem; }
+  .frow { gap: 0.875rem; }
+}
+
+/* COMMON SMARTPHONES ≤360px (e.g., iPhone 12 mini, Pixel 5) */
+@media screen and (max-width: 360px) {
+  /* Carousel: Critical overflow fix — shrink & clamp positions */
+  .carousel-stage { height: clamp(380px, 65vh, 420px); perspective: 600px; margin: 2rem 0 2rem; }
+  .pc {
+    width: 260px; margin-left: -130px; margin-top: -190px;
+  }
+  .pc[data-pos="0"] {
+    transform: translateZ(220px) translateY(0) rotateY(0deg);
+  }
+  .pc[data-pos="1"], .pc[data-pos="-1"] {
+    transform: translateZ(0px) translateX(clamp(120px, 35vw, 160px)) translateY(20px) rotateY(-40deg);
+    opacity: 0.6;
+  }
+  .pc[data-pos="2"], .pc[data-pos="-2"] {
+    transform: translateZ(-60px) translateX(clamp(200px, 45vw, 240px)) translateY(40px) rotateY(-50deg);
+    opacity: 0.3;
+  }
+  .pc[data-pos="3"], .pc[data-pos="-3"] {
+    opacity: 0 !important; pointer-events: none !important;
+    transform: translateZ(-180px) translateX(0) translateY(0) rotateY(0deg);
+  }
+
+  /* Hero even smaller */
+  .hero-photo-wrap { width: 180px; height: 180px; }
+  .hero-photo-frame { width: 145px; height: 145px; }
+  .hero-glow { transform: scale(0.5); opacity: 0.08; }
+
+  /* Paddings minimal */
+  .sec { padding: var(--sec-pad) 3%; }
+
+  /* Chips wrap better */
+  .chips { justify-content: center; gap: 0.35rem; }
+
+  /* Contact form compact */
+  .fg input, .fg textarea { padding: 0.75rem 0.85rem; font-size: 0.9rem; }
+}
+
+/* ULTRA-NARROW ≤320px (budget/old phones) */
+@media screen and (max-width: 320px) {
+  html { font-size: 14px; }
+
+  .sec { padding-left: 2.5%; padding-right: 2.5%; }
+
+  /* Hide decorative elements if needed */
+  .hero-photo-orb { display: none; }
+
+  /* Typography tighter */
+  h1 { letter-spacing: -0.05em; line-height: 0.9; }
+  .sh { font-size: clamp(1.6rem, 5vw, 2.6rem); }
+
+  /* Nav logo smaller */
+  .n-logo { font-size: 1.1rem; }
+
+  /* Backtop smaller */
+  .back-top { width: 36px; height: 36px; bottom: 1rem; right: 1rem; }
+}
+
+/* LANDSCAPE / SHORT VIEWPORT FIX (e.g., phones rotated) */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  #hero { min-height: 100vh; align-items: stretch; padding: 4rem 4% 2rem; }
+  .hero-photo-wrap { width: 220px; height: 220px; align-self: center; }
+  h1 { font-size: 3rem; }
+}
+
+/* TOUCH HOVER OVERRIDE — Prevent layout shift */
+@media (hover: none) {
+  .pc[data-pos="0"]:hover .pt-ov,
+  .btn-primary:hover,
+  .btn-ghost:hover,
+  .soc-pill:hover { transform: none; }
+  /* Ensure tap targets don't move */
+  button, a { transform: translateZ(0); will-change: auto; }
+}
+
+/* HIGH DPI / Retina — Sharper renders */
+@media screen and (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hero-photo-img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+}
