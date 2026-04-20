@@ -513,31 +513,36 @@ function debounce(fn, ms) {
     sendBtn.disabled  = true;
     btnText.textContent = 'Sending…';
 
-    /*
-     * To wire up real email delivery, replace the FORM_ACTION value
-     * with your Formspree endpoint:
-     *   const FORM_ACTION = 'https://formspree.io/f/YOUR_FORM_ID';
-     *
-     * Then uncomment the fetch block below.
-     */
-    const FORM_ACTION = null;
+    const FORM_ACTION = 'https://script.google.com/macros/s/AKfycbzu1t3RFX4HSp7L0mL4u2kOeown_FVxqrqnIYer-kR66BeYRRBU2ftrzDL5JA45mMu6/exec';
 
     if (FORM_ACTION) {
       try {
-        const res = await fetch(FORM_ACTION, {
+        /*
+         * Google Apps Script needs FormData with mode:'no-cors'.
+         * - Do NOT set Content-Type manually (browser sets multipart boundary).
+         * - Do NOT use JSON — Apps Script reads e.parameter.* from form fields.
+         * - mode:'no-cors' avoids the CORS preflight that Apps Script rejects.
+         * - Response will be opaque (status 0) — expected, not an error.
+         */
+        const fd = new FormData();
+        fd.append('name',    name);
+        fd.append('email',   email);
+        fd.append('subject', getVal('fs') || '(no subject)');
+        fd.append('message', message);
+
+        await fetch(FORM_ACTION, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ name, email, subject: getVal('fs'), message }),
+          mode:   'no-cors',
+          body:   fd,
         });
-        if (!res.ok) throw new Error('Network response not ok');
-      } catch (_) {
+      } catch (err) {
+        console.error('Form submit error:', err);
         btnText.textContent = 'Send Message';
         sendBtn.disabled    = false;
         alert('Something went wrong. Please try again or email me directly.');
         return;
       }
     } else {
-      /* Simulate network delay in demo mode */
       await new Promise(r => setTimeout(r, 800));
     }
 
