@@ -368,6 +368,23 @@ function debounce(fn, ms) {
     if (e.key === 'ArrowLeft')  { advance(-1); stopAuto(); startAuto(); }
     if (e.key === 'ArrowRight') { advance(1);  stopAuto(); startAuto(); }
   });
+
+  /* Touch swipe support for mobile */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  scene.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  scene.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    /* Only treat as horizontal swipe if mostly horizontal */
+    if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.5) {
+      if (dx < 0) { advance(1);  stopAuto(); startAuto(); } /* swipe left  = next */
+      else        { advance(-1); stopAuto(); startAuto(); } /* swipe right = prev */
+    }
+  }, { passive: true });
 })();
 
 
@@ -383,12 +400,24 @@ function debounce(fn, ms) {
     return;
   }
 
+  /* Lower threshold on mobile so tall elements still trigger */
+  const isMob = window.innerWidth <= 768;
   const io = new IntersectionObserver(
-    (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
-    { threshold: 0.08 }
+    (entries) => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }),
+    { threshold: isMob ? 0.04 : 0.08, rootMargin: isMob ? '0px 0px -30px 0px' : '0px' }
   );
 
   $$('.rv, .rv2').forEach(el => io.observe(el));
+
+  /* Failsafe: reveal anything already visible on load */
+  setTimeout(() => {
+    $$('.rv:not(.in), .rv2:not(.in)').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.98) el.classList.add('in');
+    });
+  }, 400);
 })();
 
 

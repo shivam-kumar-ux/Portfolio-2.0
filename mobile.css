@@ -1,183 +1,533 @@
-/* MOBILE.css — Portfolio 2.0 Mobile Optimizations
-   Loads conditionally ≤768px after style.css. Mobile-first fixes for overflows/hidden elements.
-   Fine-grained @media prevents viewport escape (carousel, hero, canvases, grids).
-   Touch-friendly, no desktop impact. */
+/* ══════════════════════════════════════════════════════════════
+   mobile.css — Shivam Kumar Portfolio
+   Full mobile fix layer. Loaded after style.css for all widths.
+   Targets: ≤768px  ≤480px  ≤360px  ≤320px  landscape
+══════════════════════════════════════════════════════════════ */
 
-/* BASE MOBILE OVERRIDES (≤768px) — Refine existing style.css mobile */
-@media screen and (max-width: 768px) {
-  :root {
-    --sec-pad: clamp(2.5rem, 6vw, 3.5rem) 4%;
-    --r: 12px;
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GLOBAL OVERFLOW GUARD — prevent any element escaping viewport
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 768px) {
+
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
-  body {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-    /* Prevent zoom on iOS inputs */
-    touch-action: manipulation;
+  /* Every section must stay inside viewport */
+  .sec, #hero, .mq-wrap, footer, header {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
-  /* Navigation tighter */
-  #nav { padding: 1rem 4%; }
-  #nav.scr { padding: 0.75rem 4%; }
 
-  /* Hero: Constrain all to viewport */
+  /* ── NAVIGATION ───────────────────────────────────────────── */
+  #nav { padding: 0.9rem 4%; }
+  #nav.scr { padding: 0.7rem 4%; }
+
+  .n-links, .n-cta { display: none; }
+  .burger { display: flex; }
+
+
+  /* ── HERO ─────────────────────────────────────────────────── */
   #hero {
-    padding: 6rem 4% 2.5rem;
-    gap: 1.75rem;
+    /* Single column: text on top, photo below */
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    text-align: center;
+    padding: 6rem 5% 3.5rem;
+    gap: 3rem;
+    min-height: 100svh;
+    overflow: hidden; /* contain orbiting dots */
   }
-  .hero-glow { transform: scale(0.7); }
-  .hero-glow--cyan { width: 280px; height: 280px; top: -80px; left: -120px; }
-  .hero-glow--violet { width: 220px; height: 220px; bottom: -80px; right: -80px; }
 
-  .hero-photo-wrap { width: clamp(200px, 45vw, 240px); height: clamp(200px, 45vw, 240px); }
-  .hero-photo-frame { width: clamp(160px, 38vw, 190px); height: clamp(160px, 38vw, 190px); }
+  /* Text column fills full width */
+  .hl {
+    width: 100%;
+    order: 1;
+  }
+
+  /* Photo column centered below text */
+  .hr {
+    width: 100%;
+    order: 2;
+    justify-content: center;
+  }
+
+  /* Three.js canvas hidden on mobile — save GPU */
   #tc.hero-3d-bg {
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: 100vw;
-    max-height: 100vh;
-    object-fit: cover;
+    display: none !important;
   }
 
-  /* Stack & center everything earlier */
-  .ab-grid,
-  .ex-grid,
-  .ct-grid { grid-template-columns: 1fr; gap: 2rem; }
+  /* Glow blobs scaled down so they don't overflow */
+  .hero-glow--cyan   { width: 240px; height: 240px; top: -60px; left: -80px; opacity: 0.08; }
+  .hero-glow--violet { width: 200px; height: 200px; bottom: -60px; right: -60px; opacity: 0.08; }
 
-  /* Skills: Single column earlier */
-  .sk-pnl.on { grid-template-columns: 1fr; gap: 1rem; }
+  /* Center hero text items */
+  .h-sub  { max-width: 100%; margin-left: auto; margin-right: auto; }
+  .h-btns { justify-content: center; flex-direction: column; align-items: stretch; gap: 0.75rem; }
+  .h-soc  { justify-content: center; }
+  .btn-primary, .btn-ghost { width: 100%; justify-content: center; text-align: center; }
 
-  /* Services single earlier */
-  .sv-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-
-  /* Canvases viewport-safe */
-  #sfx {
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: 100vw;
-    max-height: 100vh;
+  /* Photo frame — fit on mobile */
+  .hero-photo-wrap {
+    width: clamp(210px, 55vw, 260px);
+    height: clamp(210px, 55vw, 260px);
+    margin: 0 auto;
+  }
+  .hero-photo-frame {
+    width: clamp(170px, 44vw, 210px);
+    height: clamp(170px, 44vw, 210px);
   }
 
-  /* Buttons touch-friendly */
-  .btn-primary,
-  .btn-ghost,
-  .n-cta {
-    min-height: 2.25rem;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.8rem;
+  /* Orbiting dots — reduce radius so they stay inside */
+  @keyframes orbitDot1 {
+    from { transform: rotate(0deg)   translateX(120px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
   }
-  .h-btns { flex-direction: column; align-items: stretch; gap: 0.75rem; }
-  .btn-full { width: 100%; }
-}
+  @keyframes orbitDot2 {
+    from { transform: rotate(120deg) translateX(135px) rotate(-120deg); }
+    to   { transform: rotate(480deg) translateX(135px) rotate(-480deg); }
+  }
+  @keyframes orbitDot3 {
+    from { transform: rotate(240deg) translateX(145px) rotate(-240deg); }
+    to   { transform: rotate(600deg) translateX(145px) rotate(-600deg); }
+  }
 
-/* NARROW PHONES ≤480px (e.g., iPhone SE, Galaxy Fold) */
-@media screen and (max-width: 480px) {
-  html { font-size: 15px; } /* Slight bump for readability */
+  /* Rotating rings — keep inside wrap */
+  .hero-photo-ring--1 { inset: -10px; }
+  .hero-photo-ring--2 { inset: -22px; }
 
-  #nav { padding: 0.9rem 3.5%; }
+  /* Badge below photo */
+  .hero-photo-badge {
+    font-size: 0.55rem;
+    padding: 0.3rem 0.8rem;
+    bottom: -14px;
+    white-space: nowrap;
+  }
+
+  /* Scroll hint */
+  .h-scroll { display: none; }
+
+
+  /* ── MARQUEE ──────────────────────────────────────────────── */
+  .mq-wrap {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+
+
+  /* ── ABOUT ────────────────────────────────────────────────── */
+  .ab-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  /* Show the about frame in a sensible size */
+  .ab-media { order: 1; }
+  .ab-text  { order: 2; }
+
+  .ab-frame {
+    max-width: 260px;
+    margin: 0 auto;
+    aspect-ratio: 0.9;
+  }
+
+  /* Floating badges — hide (they bleed outside on mobile) */
+  .fl1, .fl2, .fl3 { display: none; }
+
+  /* Info grid single column */
+  .info-g { grid-template-columns: 1fr 1fr; }
+
+  /* Chips wrap nicely */
+  .chips { justify-content: flex-start; gap: 0.4rem; }
+
+
+  /* ── SKILLS ───────────────────────────────────────────────── */
+  .sk-tabs { flex-wrap: wrap; gap: 0.4rem; }
+  .sk-tab  { font-size: 0.72rem; padding: 0.5rem 1rem; }
+
+  .sk-pnl.on {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+
+  .sk-card { padding: 1.1rem; }
+
+
+  /* ── PROJECTS CAROUSEL ────────────────────────────────────── */
+  .carousel-stage {
+    height: 500px;
+    perspective: 700px;
+    perspective-origin: 50% 45%;
+    overflow: hidden; /* critical: clip cards that extend outside */
+  }
+
+  /* Make active card fit the screen */
+  .pc {
+    width: min(290px, 82vw);
+    margin-left: calc(min(290px, 82vw) / -2);
+    margin-top: -220px;
+  }
+
+  /* Active card: straight, centred, no sideways offset */
+  .pc[data-pos="0"] {
+    transform: translateZ(200px) translateY(0) rotateY(0deg);
+    animation: cardFloatMob 4.5s ease-in-out infinite;
+  }
+  @keyframes cardFloatMob {
+    0%,100% { transform: translateZ(200px) translateY(0px) rotateY(0deg); }
+    50%      { transform: translateZ(200px) translateY(-10px) rotateY(1deg); }
+  }
+
+  /* Side cards — smaller offset so they peek but don't overflow */
+  .pc[data-pos="1"] {
+    transform: translateZ(0px) translateX(min(160px, 42vw)) translateY(30px) rotateY(-42deg);
+    opacity: 0.45;
+  }
+  .pc[data-pos="-1"] {
+    transform: translateZ(0px) translateX(calc(min(160px, 42vw) * -1)) translateY(30px) rotateY(42deg);
+    opacity: 0.45;
+  }
+
+  /* Further cards: fully hidden */
+  .pc[data-pos="2"],  .pc[data-pos="-2"],
+  .pc[data-pos="3"],  .pc[data-pos="-3"] {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateZ(-300px) !important;
+  }
+
+  /* Touch-friendly nav arrows */
+  .carousel-arrow {
+    width: 44px; height: 44px;
+    font-size: 1rem;
+  }
+
+  /* Thumbnail area slightly smaller */
+  .pt { height: 190px; }
+
+
+  /* ── EXPERIENCE ───────────────────────────────────────────── */
+  .ex-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  /* Timeline first, stats below */
+  .tl  { order: 1; }
+  .st-col { order: 2; }
+
+  .st-card { padding: 1.1rem 1rem; }
+  .st-ico  { width: 44px; height: 44px; font-size: 1.1rem; border-radius: 10px; }
+  .st-num  { font-size: 1.6rem; }
+
+
+  /* ── SERVICES ─────────────────────────────────────────────── */
+  .sv-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .sv-card {
+    padding: 1.75rem 1.4rem;
+  }
+
+
+  /* ── CONTACT ──────────────────────────────────────────────── */
+  .ct-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Form stacks cleanly */
+  .frow { grid-template-columns: 1fr; gap: 0; }
+
+  .fc { padding: 1.6rem; }
+
+  .soc-a { padding: 0.8rem 0.9rem; }
+  .soc-ico { width: 32px; height: 32px; font-size: 0.95rem; }
+  .soc-h   { font-size: 0.65rem; }
+
+
+  /* ── FOOTER ───────────────────────────────────────────────── */
+  footer {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.65rem;
+    padding: 1.5rem 5%;
+  }
+  .f-links { justify-content: center; flex-wrap: wrap; gap: 1rem; }
+
+
+  /* ── BACK TO TOP ──────────────────────────────────────────── */
+  .back-top {
+    bottom: 1.25rem; right: 1.25rem;
+    width: 38px; height: 38px;
+    font-size: 0.9rem;
+  }
+
+
+  /* ── TOUCH CURSOR ─────────────────────────────────────────── */
+  body { cursor: auto; }
+  #cur, #cur2 { display: none !important; }
+
+
+  /* ── BUTTONS ──────────────────────────────────────────────── */
+  .btn-primary, .btn-ghost, .n-cta {
+    min-height: 2.5rem;
+    cursor: pointer; /* restore normal cursor on touch */
+  }
+  .sk-tab, .carousel-arrow, button, a {
+    cursor: pointer;
+  }
+
+
+  /* ── SCROLL REVEAL — ensure items are visible on mobile ───── */
+  /* Use a shorter threshold and make sure nothing stays hidden */
+  .rv, .rv2 {
+    transition-duration: 0.5s;
+  }
+
+
+  /* ── SECTION PADDING ──────────────────────────────────────── */
+  :root { --sec-pad: clamp(3rem, 7vw, 4rem) 5%; }
+
+} /* end @media 768px */
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NARROW PHONES  ≤ 480px
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 480px) {
+
+  html { font-size: 15px; }
+
+  /* Hero tighter */
+  #hero { padding: 5.5rem 4.5% 3rem; gap: 2.25rem; }
+
+  h1 { font-size: clamp(2.4rem, 7vw, 3.8rem); letter-spacing: -0.04em; }
+  .h-role { font-size: 0.82rem; }
+  .h-sub  { font-size: 0.92rem; line-height: 1.75; }
+  .h-badge { font-size: 0.6rem; padding: 0.35rem 0.85rem; }
+
+  /* Photo even smaller */
+  .hero-photo-wrap  { width: 200px; height: 200px; }
+  .hero-photo-frame { width: 162px; height: 162px; }
+  .hero-photo-badge { font-size: 0.52rem; padding: 0.28rem 0.7rem; bottom: -12px; }
+
+  @keyframes orbitDot1 {
+    from { transform: rotate(0deg)   translateX(105px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(105px) rotate(-360deg); }
+  }
+  @keyframes orbitDot2 {
+    from { transform: rotate(120deg) translateX(116px) rotate(-120deg); }
+    to   { transform: rotate(480deg) translateX(116px) rotate(-480deg); }
+  }
+  @keyframes orbitDot3 {
+    from { transform: rotate(240deg) translateX(124px) rotate(-240deg); }
+    to   { transform: rotate(600deg) translateX(124px) rotate(-600deg); }
+  }
+
+  /* Carousel card: full mobile width */
+  .pc {
+    width: min(270px, 88vw);
+    margin-left: calc(min(270px, 88vw) / -2);
+  }
+
+  /* Skills: single column */
+  .sk-pnl.on { grid-template-columns: 1fr; gap: 0.75rem; }
+
+  /* About frame */
+  .ab-frame { max-width: 230px; }
+  .info-g   { grid-template-columns: 1fr 1fr; }
+
+  /* Contact form */
+  .fc     { padding: 1.4rem; }
+  .frow   { gap: 0; }
+
+  /* Footer */
+  footer  { padding: 1.25rem 4%; }
+
+  /* Section heading smaller */
+  .sh { font-size: clamp(1.7rem, 5vw, 2.4rem); }
+  .ssub { font-size: 0.9rem; }
+
+  /* Navigation */
+  #nav { padding: 0.85rem 4%; }
   .n-logo { font-size: 1.2rem; }
 
-  /* Hero ultra-compact */
-  #hero { padding-top: 5.5rem; padding-bottom: 2rem; gap: 1.5rem; }
-  h1 { font-size: clamp(2.2rem, 6.5vw, 4.5rem); }
-  .h-role { font-size: 0.85rem; }
-  .h-sub { font-size: 0.95rem; max-width: none; }
-  .hero-photo-wrap { width: 200px; height: 200px; }
-  .hero-photo-frame { width: 160px; height: 160px; }
-  .hero-photo-badge { font-size: 0.55rem; padding: 0.3rem 0.75rem; bottom: -14px; }
+} /* end @media 480px */
 
-  /* About frame smaller */
-  .ab-frame { aspect-ratio: 0.9; max-width: 260px; margin: 0 auto; }
 
-  /* Info grid single */
-  .info-g { grid-template-columns: 1fr; }
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SMALL PHONES  ≤ 360px  (Galaxy S, iPhone mini)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 360px) {
 
-  /* Marquee tighter mask */
-  .mq-wrap {
-    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  html { font-size: 14.5px; }
+
+  #hero { padding: 5rem 4% 2.5rem; gap: 2rem; }
+
+  h1 { font-size: clamp(2.1rem, 6.5vw, 3rem); }
+
+  .hero-photo-wrap  { width: 185px; height: 185px; }
+  .hero-photo-frame { width: 150px; height: 150px; }
+  .hero-photo-badge { font-size: 0.5rem; padding: 0.25rem 0.65rem; }
+
+  /* Orbiting dots — very tight radius */
+  @keyframes orbitDot1 {
+    from { transform: rotate(0deg)   translateX(96px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(96px) rotate(-360deg); }
+  }
+  @keyframes orbitDot2 {
+    from { transform: rotate(120deg) translateX(106px) rotate(-120deg); }
+    to   { transform: rotate(480deg) translateX(106px) rotate(-480deg); }
+  }
+  @keyframes orbitDot3 {
+    from { transform: rotate(240deg) translateX(113px) rotate(-240deg); }
+    to   { transform: rotate(600deg) translateX(113px) rotate(-600deg); }
   }
 
-  .fc { padding: 1.75rem; }
-  .frow { gap: 0.875rem; }
-}
-
-/* COMMON SMARTPHONES ≤360px (e.g., iPhone 12 mini, Pixel 5) */
-@media screen and (max-width: 360px) {
-  /* Carousel: Critical overflow fix — shrink & clamp positions */
-  .carousel-stage { height: clamp(380px, 65vh, 420px); perspective: 600px; margin: 2rem 0 2rem; }
+  /* Carousel */
+  .carousel-stage { height: 460px; }
   .pc {
-    width: 260px; margin-left: -130px; margin-top: -190px;
+    width: min(255px, 90vw);
+    margin-left: calc(min(255px, 90vw) / -2);
+    margin-top: -210px;
   }
-  .pc[data-pos="0"] {
-    transform: translateZ(220px) translateY(0) rotateY(0deg);
-  }
-  .pc[data-pos="1"], .pc[data-pos="-1"] {
-    transform: translateZ(0px) translateX(clamp(120px, 35vw, 160px)) translateY(20px) rotateY(-40deg);
-    opacity: 0.6;
-  }
-  .pc[data-pos="2"], .pc[data-pos="-2"] {
-    transform: translateZ(-60px) translateX(clamp(200px, 45vw, 240px)) translateY(40px) rotateY(-50deg);
-    opacity: 0.3;
-  }
-  .pc[data-pos="3"], .pc[data-pos="-3"] {
-    opacity: 0 !important; pointer-events: none !important;
-    transform: translateZ(-180px) translateX(0) translateY(0) rotateY(0deg);
-  }
+  .pc[data-pos="1"]  { transform: translateZ(0) translateX(min(130px, 36vw)) translateY(28px) rotateY(-38deg); }
+  .pc[data-pos="-1"] { transform: translateZ(0) translateX(calc(min(130px, 36vw) * -1)) translateY(28px) rotateY(38deg); }
 
-  /* Hero even smaller */
-  .hero-photo-wrap { width: 180px; height: 180px; }
-  .hero-photo-frame { width: 145px; height: 145px; }
-  .hero-glow { transform: scale(0.5); opacity: 0.08; }
+  /* About */
+  .ab-frame { max-width: 210px; }
+  .info-g   { grid-template-columns: 1fr; }
 
-  /* Paddings minimal */
-  .sec { padding: var(--sec-pad) 3%; }
+  /* Skills */
+  .sk-pnl.on { grid-template-columns: 1fr; }
+  .sk-tab    { font-size: 0.68rem; padding: 0.42rem 0.8rem; }
 
-  /* Chips wrap better */
-  .chips { justify-content: center; gap: 0.35rem; }
+  /* Experience stat cards */
+  .st-card { padding: 0.9rem; gap: 0.9rem; }
 
-  /* Contact form compact */
-  .fg input, .fg textarea { padding: 0.75rem 0.85rem; font-size: 0.9rem; }
-}
+  /* Services */
+  .sv-card { padding: 1.5rem 1.2rem; }
 
-/* ULTRA-NARROW ≤320px (budget/old phones) */
-@media screen and (max-width: 320px) {
+  /* Section spacing */
+  :root { --sec-pad: 2.75rem 4%; }
+
+} /* end @media 360px */
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   VERY SMALL  ≤ 320px  (old budget phones)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 320px) {
+
   html { font-size: 14px; }
 
-  .sec { padding-left: 2.5%; padding-right: 2.5%; }
+  .sec { padding-left: 3%; padding-right: 3%; }
 
-  /* Hide decorative elements if needed */
+  /* Hide orbiting dots entirely — too cramped */
   .hero-photo-orb { display: none; }
+  .hero-photo-ring--2 { display: none; }
 
-  /* Typography tighter */
-  h1 { letter-spacing: -0.05em; line-height: 0.9; }
-  .sh { font-size: clamp(1.6rem, 5vw, 2.6rem); }
+  .hero-photo-wrap  { width: 170px; height: 170px; }
+  .hero-photo-frame { width: 140px; height: 140px; }
 
-  /* Nav logo smaller */
+  h1  { letter-spacing: -0.05em; line-height: 0.9; font-size: 2rem; }
+  .sh { font-size: 1.6rem; }
   .n-logo { font-size: 1.1rem; }
 
-  /* Backtop smaller */
-  .back-top { width: 36px; height: 36px; bottom: 1rem; right: 1rem; }
-}
+  .back-top { width: 34px; height: 34px; bottom: 0.9rem; right: 0.9rem; }
 
-/* LANDSCAPE / SHORT VIEWPORT FIX (e.g., phones rotated) */
-@media screen and (max-height: 500px) and (orientation: landscape) {
-  #hero { min-height: 100vh; align-items: stretch; padding: 4rem 4% 2rem; }
-  .hero-photo-wrap { width: 220px; height: 220px; align-self: center; }
-  h1 { font-size: 3rem; }
-}
+  .fc { padding: 1.2rem; }
 
-/* TOUCH HOVER OVERRIDE — Prevent layout shift */
+} /* end @media 320px */
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LANDSCAPE SHORT VIEWPORT  (phone rotated)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 900px) {
+
+  #hero {
+    min-height: auto;
+    padding: 4.5rem 5% 2.5rem;
+    grid-template-columns: 1fr 1fr; /* side by side in landscape */
+    text-align: left;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .hl  { order: 1; }
+  .hr  { order: 2; }
+
+  .h-btns { flex-direction: row; align-items: flex-start; }
+  .btn-primary, .btn-ghost { width: auto; }
+  .h-soc  { justify-content: flex-start; }
+  .h-sub  { max-width: 100%; }
+
+  .hero-photo-wrap  { width: 170px; height: 170px; }
+  .hero-photo-frame { width: 138px; height: 138px; }
+
+  /* Tight orbit radius for landscape */
+  @keyframes orbitDot1 {
+    from { transform: rotate(0deg)   translateX(88px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(88px) rotate(-360deg); }
+  }
+  @keyframes orbitDot2 {
+    from { transform: rotate(120deg) translateX(97px) rotate(-120deg); }
+    to   { transform: rotate(480deg) translateX(97px) rotate(-480deg); }
+  }
+  @keyframes orbitDot3 {
+    from { transform: rotate(240deg) translateX(104px) rotate(-240deg); }
+    to   { transform: rotate(600deg) translateX(104px) rotate(-600deg); }
+  }
+
+  h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+
+} /* end landscape */
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOUCH DEVICE OVERRIDES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 @media (hover: none) {
-  .pc[data-pos="0"]:hover .pt-ov,
+
+  /* Prevent layout shift on tap — remove hover transforms */
   .btn-primary:hover,
   .btn-ghost:hover,
-  .soc-pill:hover { transform: none; }
-  /* Ensure tap targets don't move */
-  button, a { transform: translateZ(0); will-change: auto; }
-}
+  .soc-pill:hover,
+  .sv-card:hover,
+  .sk-card:hover,
+  .soc-a:hover,
+  .st-card:hover {
+    transform: none;
+  }
 
-/* HIGH DPI / Retina — Sharper renders */
-@media screen and (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .hero-photo-img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+  /* Restore default cursor */
+  body { cursor: auto; }
+  #cur, #cur2 { display: none !important; }
+  .btn-primary, .btn-ghost, button, a { cursor: pointer; }
+
+  /* Prevent zoom on input focus in iOS */
+  input, textarea, select {
+    font-size: max(16px, 1em) !important;
+  }
+
+} /* end hover:none */
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HIGH-DPI / RETINA  — sharper photo rendering
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hero-photo-img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
 }
